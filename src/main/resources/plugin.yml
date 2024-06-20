@@ -1,0 +1,4 @@
+name: BanManager
+version: '${version}'
+main: fr.silenthill99.banmanager.Main
+api-version: '1.20'
