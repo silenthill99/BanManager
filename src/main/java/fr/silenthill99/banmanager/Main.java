@@ -24,4 +24,8 @@ public final class Main extends JavaPlugin {
     public void onDisable() {
         manager.close();
     }
+
+    public DatabaseManager getManager() {
+        return manager;
+    }
 }
