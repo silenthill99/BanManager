@@ -1,6 +1,9 @@
 package fr.silenthill99.banmanager;
 
+import fr.silenthill99.banmanager.listener.Events;
 import fr.silenthill99.banmanager.mysql.DatabaseManager;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
@@ -18,6 +21,8 @@ public final class Main extends JavaPlugin {
         instance = this;
         manager = new DatabaseManager();
         getLogger().info("Le plugin est opérationnel !");
+        PluginManager pm = Bukkit.getPluginManager();
+        pm.registerEvents(new Events(), this);
     }
 
     @Override
