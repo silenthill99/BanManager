@@ -18,13 +18,15 @@ public final class Main extends JavaPlugin {
         return instance;
     }
 
-    BanManager banManager = new BanManager();
-    PlayerInfos playerInfos = new PlayerInfos();
+    BanManager banManager;
+    PlayerInfos playerInfos;
 
     @Override
     public void onEnable() {
         instance = this;
         manager = new DatabaseManager();
+        banManager = new BanManager();
+        playerInfos = new PlayerInfos();
         getLogger().info("Le plugin est opérationnel !");
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new Events(), this);

@@ -16,12 +16,13 @@ import java.util.UUID;
 @SuppressWarnings("deprecation")
 public class BanManager {
 
-    Main main = Main.getInstance();
+    Main main;
     Connection connection;
 
-    {
+    public BanManager() {
+        this.main = Main.getInstance();
         try {
-            connection = main.getManager().connection().getConnection();
+            this.connection = main.getManager().connection().getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
