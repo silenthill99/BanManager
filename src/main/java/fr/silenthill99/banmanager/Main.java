@@ -1,6 +1,7 @@
 package fr.silenthill99.banmanager;
 
 import fr.silenthill99.banmanager.ban.BanManager;
+import fr.silenthill99.banmanager.commands.Ban;
 import fr.silenthill99.banmanager.infos.PlayerInfos;
 import fr.silenthill99.banmanager.listener.Events;
 import fr.silenthill99.banmanager.mysql.DatabaseManager;
@@ -19,7 +20,7 @@ public final class Main extends JavaPlugin {
     }
 
     BanManager banManager;
-    PlayerInfos playerInfos;
+    public PlayerInfos playerInfos;
 
     @Override
     public void onEnable() {
@@ -30,7 +31,13 @@ public final class Main extends JavaPlugin {
         getLogger().info("Le plugin est opérationnel !");
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new Events(), this);
-        banManager.ban(playerInfos.getUUID("silenthill99"), 1500, "Essai !");
+//        banManager.ban(playerInfos.getUUID("silenthill99"), 120, "Essai !");
+        commands();
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    private void commands() {
+        getCommand("ban").setExecutor(new Ban());
     }
 
     @Override
@@ -40,5 +47,9 @@ public final class Main extends JavaPlugin {
 
     public DatabaseManager getManager() {
         return manager;
+    }
+
+    public BanManager getBanManager() {
+        return banManager;
     }
 }

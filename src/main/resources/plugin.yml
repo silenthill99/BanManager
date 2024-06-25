@@ -2,3 +2,10 @@ name: BanManager
 version: '${version}'
 main: fr.silenthill99.banmanager.Main
 api-version: '1.20'
+commands:
+  ban:
+    description: Bannir un joueur !
+    permission: ban
+    permission-message: §cVous n'avez pas la permission d'éxécuter cette commande !
+  unban:
+    description: Débannir un joueur !

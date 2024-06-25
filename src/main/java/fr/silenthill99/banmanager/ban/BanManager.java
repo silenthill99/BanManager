@@ -34,6 +34,8 @@ public class BanManager {
         long endToMillis = endInSeconds*1000;
         long end = endToMillis + System.currentTimeMillis();
 
+        if (endInSeconds == -1) end = -1;
+
         try {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO bans (player_uuid, end, reason) VALUES (?, ?, ?)");
             statement.setString(1, uuid.toString());
@@ -58,7 +60,7 @@ public class BanManager {
         if (isBanned(uuid)) return;
 
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE * FROM bans WHERE player_uuid = ?");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE player_uuid = ?");
             statement.setString(1, uuid.toString());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -72,6 +74,7 @@ public class BanManager {
             statement.setString(1, uuid.toString());
             ResultSet rs = statement.executeQuery();
             return rs.next();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -79,6 +82,8 @@ public class BanManager {
 
     public void checkDuration(UUID uuid) {
         if (!isBanned(uuid)) return;
+
+        if (getEnd(uuid) == -1) return;
 
         if (getEnd(uuid) < System.currentTimeMillis()) {
             unban(uuid);
@@ -102,6 +107,8 @@ public class BanManager {
 
     public String getTimeLeft(UUID uuid) {
         if (!isBanned(uuid)) return ChatColor.RED + "Non banni";
+
+        if (getEnd(uuid) == -1) return ChatColor.RED + "Permanent";
 
         long tempsRestant = (getEnd(uuid) - System.currentTimeMillis()) / 1000;
         int mois = 0;

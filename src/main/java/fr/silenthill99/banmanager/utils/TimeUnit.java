@@ -48,4 +48,8 @@ public enum TimeUnit {
     public long getToSecond() {
         return toSecond;
     }
+
+    public static boolean existFromShortcut(String shortcut) {
+        return ID_SHORTCUT.containsKey(shortcut);
+    }
 }
