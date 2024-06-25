@@ -1,5 +1,7 @@
 package fr.silenthill99.banmanager;
 
+import fr.silenthill99.banmanager.ban.BanManager;
+import fr.silenthill99.banmanager.infos.PlayerInfos;
 import fr.silenthill99.banmanager.listener.Events;
 import fr.silenthill99.banmanager.mysql.DatabaseManager;
 import org.bukkit.Bukkit;
@@ -16,6 +18,9 @@ public final class Main extends JavaPlugin {
         return instance;
     }
 
+    BanManager banManager = new BanManager();
+    PlayerInfos playerInfos = new PlayerInfos();
+
     @Override
     public void onEnable() {
         instance = this;
@@ -23,6 +28,7 @@ public final class Main extends JavaPlugin {
         getLogger().info("Le plugin est opérationnel !");
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new Events(), this);
+        banManager.ban(playerInfos.getUUID("silenthill99"), 1500, "Essai !");
     }
 
     @Override
