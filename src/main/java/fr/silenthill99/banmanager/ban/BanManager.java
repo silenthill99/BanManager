@@ -12,6 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("deprecation")
 public class BanManager {
@@ -36,15 +39,18 @@ public class BanManager {
 
         if (endInSeconds == -1) end = -1;
 
-        try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO bans (player_uuid, end, reason) VALUES (?, ?, ?)");
-            statement.setString(1, uuid.toString());
-            statement.setLong(2, end);
-            statement.setString(3, reason);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        long finalEnd = end;
+        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO bans (player_uuid, end, reason) VALUES (?, ?, ?)");
+                statement.setString(1, uuid.toString());
+                statement.setLong(2, finalEnd);
+                statement.setString(3, reason);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Player target = Bukkit.getPlayer(uuid);
         if (target != null) {
@@ -57,27 +63,34 @@ public class BanManager {
     }
 
     public void unban(UUID uuid) {
-        if (isBanned(uuid)) return;
-
-        try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE player_uuid = ?");
-            statement.setString(1, uuid.toString());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        if (!isBanned(uuid)) return;
+        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE player_uuid = ?");
+                statement.setString(1, uuid.toString());
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public boolean isBanned(UUID uuid) {
-        try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bans WHERE player_uuid = ?");
-            statement.setString(1, uuid.toString());
-            ResultSet rs = statement.executeQuery();
-            return rs.next();
+        AtomicBoolean banned = new AtomicBoolean(false);
+        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM bans WHERE player_uuid = ?");
+                statement.setString(1, uuid.toString());
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) {
+                    banned.set(true);
+                }
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return banned.get();
     }
 
     public void checkDuration(UUID uuid) {
@@ -91,18 +104,23 @@ public class BanManager {
     }
 
     public long getEnd(UUID uuid) {
-        if(!isBanned(uuid)) return 0;
-        try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bans WHERE player_uuid=?");
-            statement.setString(1, uuid.toString());
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                return rs.getLong("end");
+        AtomicLong end = new AtomicLong();
+
+        if(!isBanned(uuid)) end.set(0);
+
+        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM bans WHERE player_uuid=?");
+                statement.setString(1, uuid.toString());
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) {
+                    end.set(rs.getLong("end"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return 0;
+        });
+        return end.get();
     }
 
     public String getTimeLeft(UUID uuid) {
@@ -143,18 +161,21 @@ public class BanManager {
     }
 
     public String getReason(UUID uuid) {
-        if (!isBanned(uuid)) return ChatColor.RED + "Non banni";
-        try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM bans WHERE player_uuid = ?");
-            statement.setString(1, uuid.toString());
-            ResultSet rs = statement.executeQuery();
-            if(rs.next()) {
-                return rs.getString("reason");
+        AtomicReference<String> message = new AtomicReference<>(ChatColor.RED + "Non banni");
+        if (!isBanned(uuid)) return message.get();
+        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            try {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM bans WHERE player_uuid = ?");
+                statement.setString(1, uuid.toString());
+                ResultSet rs = statement.executeQuery();
+                if(rs.next()) {
+                    message.set(rs.getString("reason"));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return ChatColor.RED + "Non banni";
+        });
+        return message.get();
     }
 
 }
