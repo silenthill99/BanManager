@@ -9,3 +9,5 @@ commands:
     permission-message: §cVous n'avez pas la permission d'éxécuter cette commande !
   unban:
     description: Débannir un joueur !
+    permission: unban
+    permission-message: §cVous n'avez pas la permission d'éxécuter cette commande !

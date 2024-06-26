@@ -25,6 +25,7 @@ public class Events implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         if (main.getBanManager().isBanned(player.getUniqueId())) {
+            main.getBanManager().checkDuration(player.getUniqueId());
             event.setResult(PlayerLoginEvent.Result.KICK_BANNED);
             event.setKickMessage(ChatColor.RED + "Vous êtes banni !\n " +
                 "\n" +
