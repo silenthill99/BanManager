@@ -2,6 +2,7 @@ package fr.silenthill99.banmanager;
 
 import fr.silenthill99.banmanager.ban.BanManager;
 import fr.silenthill99.banmanager.commands.Ban;
+import fr.silenthill99.banmanager.commands.Check;
 import fr.silenthill99.banmanager.commands.Unban;
 import fr.silenthill99.banmanager.infos.PlayerInfos;
 import fr.silenthill99.banmanager.listener.Events;
@@ -32,7 +33,6 @@ public final class Main extends JavaPlugin {
         getLogger().info("Le plugin est opérationnel !");
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new Events(), this);
-//        banManager.ban(playerInfos.getUUID("silenthill99"), 120, "Essai !");
         commands();
     }
 
@@ -40,6 +40,7 @@ public final class Main extends JavaPlugin {
     private void commands() {
         getCommand("ban").setExecutor(new Ban());
         getCommand("unban").setExecutor(new Unban());
+        getCommand("check").setExecutor(new Check());
     }
 
     @Override

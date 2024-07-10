@@ -85,7 +85,7 @@ public class PlayerInfos {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        throw new NullPointerException("Le joueur n'a pas d'informatiions dans la table !");
+        throw new NullPointerException("Le joueur n'a pas d'informations dans la table !");
     }
 
 }

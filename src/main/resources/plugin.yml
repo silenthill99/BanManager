@@ -11,3 +11,6 @@ commands:
     description: Débannir un joueur !
     permission: unban
     permission-message: §cVous n'avez pas la permission d'éxécuter cette commande !
+  check:
+    description: Check un joueur !
+    permission: check
